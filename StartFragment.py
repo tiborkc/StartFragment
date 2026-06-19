@@ -16,13 +16,6 @@ from config import (
 # MANUAL INPUT
 quoteId = "1000000913"
 
-
-# MANUAL INPUT
-
-
-quoteId = "1000000913"
-
-
 # GENERATED VALUES
 
 

@@ -627,9 +627,7 @@ payload = {
     "kafkaMethod": "CREATE",
 }
 
-response = requests.patch(
-    PUBLISH_HOST, headers=PUBLISH_HEADERS, json=payload, verify=False
-)
+response = requests.patch(PUBLISH_HOST, headers=PUBLISH_HEADERS, json=payload)
 
 print("PUBLISH STATUS:", response.status_code)
 

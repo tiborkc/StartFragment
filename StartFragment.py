@@ -1,40 +1,26 @@
 import requests
 import uuid
 from datetime import datetime, timezone
-
-
-# CONFIG
-PUBLISH_HOST = (
-    "https://dev2-mt-agreement.paas.telekom.hu/agreements/internal/v1/kafka-publish"
+from config import (
+    PUBLISH_HOST,
+    PUBLISH_HEADERS,
+    AGREEMENT_HOST,
+    QUOTE_HOST,
+    AGREEMENT_API_KEY,
+    QUOTE_API_KEY,
+    MONOGRAM,
+    CUSTOMER_ID,
+    CREATED_BY,
 )
 
-PUBLISH_HEADERS = {
-    "x-channel-id": "IFE_DPS",
-    "brand": "MT",
-    "x-request-id": "corr-2026-06-16T07:57:56.329Z-0.151152452872503",
-    "x-m2m-user-id": "asd",
-    "x-Client-Id": "asd",
-    "x-Client-Version": "asd",
-    "x-request-session-id": "dsd",
-    "Content-Type": "application/json",
-    "x-api-key": "b2b-cm:d0466a66-4404-4179-b9da-2f245af735df",
-}
-
-AGREEMENT_HOST = "https://dev2-mt-agreement.paas.telekom.hu"
-QUOTE_HOST = "https://dev2-mt-quote-management.paas.telekom.hu"
-
-AGREEMENT_API_KEY = "TECH661389:d9eac975-7130-4496-ae4f-481e2be3dadb"
-QUOTE_API_KEY = "TECH674279:922f3348-362f-492b-ad46-a21de08b91b7"
-
-MONOGRAM = "KT"
-CUSTOMER_ID = "495294470"
-CREATED_BY = "toth1laszlo726"
+# MANUAL INPUT
+quoteId = "1000000913"
 
 
 # MANUAL INPUT
 
 
-quoteId = "1000000880"
+quoteId = "1000000913"
 
 
 # GENERATED VALUES

@@ -14,7 +14,7 @@ from config import (
 )
 
 # MANUAL INPUT
-quoteId = "1000000913"
+quoteId = "1000000952"
 
 # GENERATED VALUES
 
@@ -412,6 +412,7 @@ kafka_inprocess_response = requests.post(
 )
 
 print(f"STATUS: {kafka_inprocess_response.status_code}")
+print(kafka_inprocess_response.text)
 print()
 
 
@@ -516,6 +517,7 @@ kafka_signed_response = requests.post(
 )
 
 print(f"STATUS: {kafka_signed_response.status_code}")
+print(kafka_signed_response.text)
 print()
 
 
@@ -620,6 +622,7 @@ kafka_active_response = requests.post(
 )
 
 print(f"STATUS: {kafka_active_response.status_code}")
+print(kafka_active_response.text)
 print()
 
 payload = {

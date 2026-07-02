@@ -6,21 +6,19 @@ from config import (
     PUBLISH_HEADERS,
     AGREEMENT_HOST,
     QUOTE_HOST,
-    AGREEMENT_API_KEY,
-    QUOTE_API_KEY,
+    TENANT_ID,
     MONOGRAM,
     CUSTOMER_ID,
     CREATED_BY,
+    AGREEMENT_BASE_HEADERS,
+    CALCULATE_MIN_BASE_HEADERS,
 )
 
 # MANUAL INPUT
-quoteId = "1000000952"
+quoteId = "1000000974"
 
 # GENERATED VALUES
-
-
 now = datetime.now(timezone.utc)
-
 current_timestamp = now.isoformat(timespec="milliseconds").replace("+00:00", "Z")
 current_date = now.strftime("%Y-%m-%d %H:%M:%S")
 compact_date = now.strftime("%Y%m%d%H%M%S")
@@ -30,52 +28,28 @@ SFA_CONTRACT_ID = f"TESZT-{compact_date}"
 AGREEMENT_NAME = f"Teszt Kft - {current_date}"
 
 
-print("GENERATED VALUES")
-
-print(f"GENERATED_ID: {GENERATED_ID}")
-print(f"SFA_CONTRACT_ID: {SFA_CONTRACT_ID}")
-print(f"AGREEMENT_NAME: {AGREEMENT_NAME}")
-print(f"TIMESTAMP: {current_timestamp}")
-print()
-
-
 # COMMON HELPERS
-
-
 def new_guid():
     return str(uuid.uuid4())
 
 
+# Agreement fejlécek
 AGREEMENT_HEADERS = {
-    "Content-Type": "application/json",
-    "X-Api-Key": AGREEMENT_API_KEY,
+    **AGREEMENT_BASE_HEADERS,
     "X-Request-Id": new_guid(),
     "X-Request-Tracking-Id": new_guid(),
     "X-Request-Session-Id": new_guid(),
 }
 
-
-# 1. CALCULATE MIN
-
-
+# Calculate Min fejlécek
 calculate_min_headers = {
+    **CALCULATE_MIN_BASE_HEADERS,
     "X-Request-Id": new_guid(),
     "X-Request-Tracking-Id": new_guid(),
     "X-Request-Session-Id": new_guid(),
-    "X-Api-Key": QUOTE_API_KEY,
-    "x-channel-id": "12",
-    "x-context-id": "123",
-    "x-correlation-id": "1234",
-    "x-m2m-user-id": "12345",
-    "x-source-system": "123456",
-    "x-source-system-user": "1234567",
-    "x-parent-request-id": "12345678",
-    "tenantId": "MT",
-    "Content-Type": "application/json",
 }
 
 calculate_min_body = {"quoteId": quoteId}
-
 
 print("1. CALCULATE MIN")
 
@@ -174,7 +148,7 @@ kafka_draft_body = {
     "header": {
         "masterId": GENERATED_ID,
         "associationId": {},
-        "tenantId": "MT",
+        "tenantId": TENANT_ID,
         "trackingId": new_guid(),
         "messageId": new_guid(),
         "producerId": {},

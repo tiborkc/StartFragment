@@ -8,14 +8,13 @@ from config import (
     QUOTE_HOST,
     TENANT_ID,
     MONOGRAM,
-    CUSTOMER_ID,
     CREATED_BY,
     AGREEMENT_BASE_HEADERS,
     CALCULATE_MIN_BASE_HEADERS,
 )
 
 # MANUAL INPUT
-quoteId = "1000000974"
+quoteId = "1000000990"
 
 # GENERATED VALUES
 now = datetime.now(timezone.utc)
@@ -84,6 +83,16 @@ OPPORTUNITY_BUSINESS_ID = opportunity_entity["relatedEntityBusinessId"]
 
 print(f"OPPORTUNITY_ID: {OPPORTUNITY_ID}")
 print(f"OPPORTUNITY_BUSINESS_ID: {OPPORTUNITY_BUSINESS_ID}")
+
+related_parties = calculate_min_json[0].get("relatedParties", [])
+
+if not related_parties:
+    raise Exception("No related parties found in calculateMin response")
+
+CUSTOMER_ID = related_parties[0]["id"]
+
+print(f"CUSTOMER_ID: {CUSTOMER_ID}")
+print()
 
 
 # 2. AGREEMENT CREATE

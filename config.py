@@ -16,7 +16,6 @@ PUBLISH_X_API_KEY = os.getenv(f"{ENV}_PUBLISH_X_API_KEY")
 # 2. Globális
 TENANT_ID = os.getenv("TENANT_ID", "MT")
 MONOGRAM = os.getenv("MONOGRAM")
-CUSTOMER_ID = os.getenv("CUSTOMER_ID")
 CREATED_BY = os.getenv("CREATED_BY")
 
 # 3. FIX FEJLÉCEK

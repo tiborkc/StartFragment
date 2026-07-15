@@ -14,13 +14,15 @@ from config import (
 )
 
 # MANUAL INPUT
-quoteId = "1000000990"
+quoteId = "1000001072"
 
 # GENERATED VALUES
 now = datetime.now(timezone.utc)
 current_timestamp = now.isoformat(timespec="milliseconds").replace("+00:00", "Z")
 current_date = now.strftime("%Y-%m-%d %H:%M:%S")
 compact_date = now.strftime("%Y%m%d%H%M%S")
+
+current_unix_ms = int(now.timestamp() * 1000)
 
 GENERATED_ID = f"{MONOGRAM}{compact_date}"
 SFA_CONTRACT_ID = f"TESZT-{compact_date}"
@@ -60,6 +62,7 @@ calculate_min_response = requests.post(
 )
 
 print(f"STATUS: {calculate_min_response.status_code}")
+print(GENERATED_ID)
 print()
 
 calculate_min_response.raise_for_status()
@@ -155,15 +158,15 @@ print()
 
 kafka_draft_body = {
     "header": {
-        "masterId": GENERATED_ID,
+        "masterId": GENERATED_ID,  
         "associationId": {},
         "tenantId": TENANT_ID,
-        "trackingId": new_guid(),
-        "messageId": new_guid(),
-        "producerId": {},
+        "trackingId": new_guid(),  
+        "messageId": new_guid(),   
+        "producerId": {"name": "SalesForce"},  
         "eventType": "AgreementCreated",
         "operation": "CREATE",
-        "masterTimestamp": 0,
+        "masterTimestamp": current_unix_ms,  
     },
     "body": {
         "Agreement": {
@@ -279,15 +282,15 @@ print()
 
 kafka_inprocess_body = {
     "header": {
-        "masterId": SFA_CONTRACT_ID,
+        "masterId": GENERATED_ID,  
         "associationId": {},
-        "tenantId": "MT",
-        "trackingId": new_guid(),
-        "messageId": new_guid(),
-        "producerId": {},
+        "tenantId": TENANT_ID,     
+        "trackingId": new_guid(),  
+        "messageId": new_guid(),   
+        "producerId": {"name": "SalesForce"},  
         "eventType": "AgreementUpdated",
         "operation": "UPDATE",
-        "masterTimestamp": 0,
+        "masterTimestamp": current_unix_ms,  
     },
     "body": {
         "Agreement": {
@@ -404,15 +407,15 @@ print()
 
 kafka_signed_body = {
     "header": {
-        "masterId": SFA_CONTRACT_ID,
+        "masterId": GENERATED_ID,  
         "associationId": {},
-        "tenantId": "MT",
-        "trackingId": new_guid(),
-        "messageId": new_guid(),
-        "producerId": {},
+        "tenantId": TENANT_ID,     
+        "trackingId": new_guid(),  
+        "messageId": new_guid(),   
+        "producerId": {"name": "SalesForce"},  
         "eventType": "AgreementUpdated",
         "operation": "UPDATE",
-        "masterTimestamp": 0,
+        "masterTimestamp": current_unix_ms,  
     },
     "body": {
         "Agreement": {
@@ -509,15 +512,15 @@ print()
 
 kafka_active_body = {
     "header": {
-        "masterId": GENERATED_ID,
+        "masterId": GENERATED_ID,  
         "associationId": {},
-        "tenantId": "MT",
-        "trackingId": new_guid(),
-        "messageId": new_guid(),
-        "producerId": {},
+        "tenantId": TENANT_ID,      
+        "trackingId": new_guid(),  
+        "messageId": new_guid(),   
+        "producerId": {"name": "SalesForce"},  
         "eventType": "AgreementUpdated",
         "operation": "UPDATE",
-        "masterTimestamp": 0,
+        "masterTimestamp": current_unix_ms,  
     },
     "body": {
         "Agreement": {

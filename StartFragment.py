@@ -14,7 +14,7 @@ from config import (
 )
 
 # MANUAL INPUT
-quoteId = "1000001072"
+quoteId = "1000001077"
 
 # GENERATED VALUES
 now = datetime.now(timezone.utc)
@@ -118,7 +118,7 @@ agreement_create_body = {
         }
     ],
     "relatedEntities": [
-        {"entityType": "SFAContract", "relatedEntityId": SFA_CONTRACT_ID},
+        {"entityType": "SFContract", "relatedEntityId": SFA_CONTRACT_ID},
         {
             "entityType": "Opportunity",
             "relatedEntityId": OPPORTUNITY_ID,
@@ -247,7 +247,7 @@ agreement_patch_body = {
         }
     ],
     "relatedEntities": [
-        {"entityType": "SFAContract", "relatedEntityId": SFA_CONTRACT_ID},
+        {"entityType": "SFContract", "relatedEntityId": SFA_CONTRACT_ID},
         {
             "entityType": "Opportunity",
             "relatedEntityId": OPPORTUNITY_ID,
@@ -274,6 +274,7 @@ agreement_patch_response = requests.patch(
 )
 
 print(f"STATUS: {agreement_patch_response.status_code}")
+print(f"RESPONSE: {agreement_patch_response.text}")
 print()
 
 

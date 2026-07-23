@@ -358,7 +358,7 @@ print(f"RESPONSE: {agreement_create_response.text}")
 print()
 
 
-# 3. KAFKA SAVE DRAFT 
+# 3. KAFKA SAVE DRAFT ez marad. példa alapján.
 
 
 kafka_draft_body = {
@@ -485,7 +485,7 @@ kafka_draft_body = {
                         {
                             "entityReferredType": "Customer",
                             "id": CUSTOMER_ID,
-                            "role": "contrOrgActive",
+                            "role": "contractOwner",
                         }
                     ],
                     "relatedEntities": [
@@ -549,7 +549,7 @@ kafka_draft_body = {
                         {
                             "entityReferredType": "Customer",
                             "id": CUSTOMER_ID,
-                            "role": "contrOrgActive",
+                            "role": "contractOwner",
                         }
                     ],
                     "relatedEntities": [
@@ -658,22 +658,16 @@ kafka_inprocess_body = {
             "type": "commercial",
             "subType": "frameAgreement",
             "characteristics": [
-                {
-                    "name": "isFrameAgreement",
-                    "value": "true",
-                },
-                {
-                    "name": "externalOrderID",
-                    "value": "",
-                },
-                {
-                    "name": "paymentPeriod",
-                    "value": "1Month",
-                },
-                {
-                    "name": "processType",
-                    "value": "Webshop",
-                },
+                {"name": "migrMethod", "value": "MOVE"},
+                {"name": "legacyID", "value": "536979013"},
+                {"name": "isPublicProcurementContract", "value": "false"},
+                {"name": "isDkuContract", "value": "false"},
+                {"name": "isEcoContract", "value": "false"},
+                {"name": "authentSetupMaster", "value": "495012014"},
+                {"name": "cidMaster", "value": "495012014"},
+                {"name": "isProductConstraintDisabled", "value": "false"},
+                {"name": "isConfidential", "value": "false"},
+                {"name": "dealerID", "value": "hamis.00001"},
             ],
             "agreementAuthorizations": [],
             "duration": None,
@@ -697,40 +691,202 @@ kafka_inprocess_body = {
                     "relatedEntityId": OPPORTUNITY_ID,
                     "role": "originalOpportunity",
                     "relatedEntityBusinessId": OPPORTUNITY_BUSINESS_ID,
-                }
+                },
+                {
+                    "entityType": "IccmWorkflow",
+                    "relatedEntityId": "2345654",
+                    "role": "CONTRACT",
+                },
+                {
+                    "entityType": "IccmWorkflow",
+                    "relatedEntityId": "3454324",
+                    "role": "ADJUSTMENT",
+                },
+            ],
+            "budgets": [
+                {
+                    "id": "a7167203-8953-47f2-95d6-abd75f4fc969",
+                    "priority": "10",
+                    "type": "poolSubsidy",
+                    "settlement": {"type": "financial", "units": "HUF"},
+                    "budgetValues": [{"type": "initial", "value": 5000000}],
+                    "budgetPeriod": {
+                        "startDateTime": "2019-07-03T22:00:00Z",
+                        "endDateTime": "2023-07-03T21:59:59Z",
+                    },
+                    "characteristics": [{"name": "approver"}],
+                    "termOrConditions": [
+                        {
+                            "name": "coveragePercentageMax",
+                            "description": "A kedvezmény mértékének maximális felhasználása százalékban.",
+                            "type": "limit",
+                            "characteristics": [
+                                {"name": "coveragePercentageMax", "value": "70"},
+                                {"name": "coverageBase", "value": "invoiceTotal"},
+                            ],
+                        },
+                        {
+                            "name": "budgetPenalty",
+                            "description": "A keret felhasználás kötbér képzéssel jár.",
+                            "type": "penalty",
+                            "characteristics": [
+                                {"name": "budgetPenalty", "value": "Y"}
+                            ],
+                        },
+                        {
+                            "name": "priceDiscountEligibilityCodes",
+                            "description": "Azon kedvezménykódok, amely kódokkal a keret felhasználható.",
+                            "type": "restriction",
+                            "characteristics": [
+                                {"name": "JAZZ_DISCOUNTCODE", "value": "KKV_12"},
+                                {"name": "JAZZ_DISCOUNTCODE", "value": "KKV_24"},
+                            ],
+                        },
+                        {
+                            "name": "usageModeDiscountCodes",
+                            "description": "Azon kedvezménykódok, amely kódokkal a keret felhasználható.",
+                            "type": "restriction",
+                            "characteristics": [
+                                {
+                                    "name": "JAZZ_DISCOUNTCODE",
+                                    "value": "SUBPOOL KESZ KEDV",
+                                }
+                            ],
+                        },
+                    ],
+                    "relatedParties": [
+                        {
+                            "entityReferredType": "Customer",
+                            "id": CUSTOMER_ID,
+                            "role": "contractOwner",
+                        }
+                    ],
+                    "relatedEntities": [
+                        {
+                            "entityType": "agreement",
+                            "relatedEntityId": OPPORTUNITY_ID,
+                        }
+                    ],
+                },
+                {
+                    "id": "327583d5-cc9c-4b79-ab5f-a0600b51150d",
+                    "priority": "10",
+                    "type": "poolSubsidy",
+                    "settlement": {"type": "financial", "units": "HUF"},
+                    "budgetValues": [{"type": "initial", "value": 12000000}],
+                    "budgetPeriod": {
+                        "startDateTime": "2020-07-03T22:00:00Z",
+                        "endDateTime": "2028-07-03T21:59:59Z",
+                    },
+                    "characteristics": [{"name": "approver"}],
+                    "termOrConditions": [
+                        {
+                            "name": "coveragePercentageMax",
+                            "description": "A kedvezmény mértékének maximális felhasználása százalékban.",
+                            "type": "limit",
+                            "characteristics": [
+                                {"name": "coveragePercentageMax", "value": "70"},
+                                {"name": "coverageBase", "value": "invoiceTotal"},
+                            ],
+                        },
+                        {
+                            "name": "budgetPenalty",
+                            "description": "A keret felhasználás kötbér képzéssel jár.",
+                            "type": "penalty",
+                            "characteristics": [
+                                {"name": "budgetPenalty", "value": "Y"}
+                            ],
+                        },
+                        {
+                            "name": "priceDiscountEligibilityCodes",
+                            "description": "Azon kedvezménykódok, amely kódokkal a keret felhasználható.",
+                            "type": "restriction",
+                            "characteristics": [
+                                {"name": "JAZZ_DISCOUNTCODE", "value": "KKV_12"},
+                                {"name": "JAZZ_DISCOUNTCODE", "value": "KKV_24"},
+                            ],
+                        },
+                        {
+                            "name": "usageModeDiscountCodes",
+                            "description": "Azon kedvezménykódok, amely kódokkal a keret felhasználható.",
+                            "type": "restriction",
+                            "characteristics": [
+                                {
+                                    "name": "JAZZ_DISCOUNTCODE",
+                                    "value": "SUBPOOL KESZ KEDV",
+                                }
+                            ],
+                        },
+                    ],
+                    "relatedParties": [
+                        {
+                            "entityReferredType": "Customer",
+                            "id": CUSTOMER_ID,
+                            "role": "contractOwner",
+                        }
+                    ],
+                    "relatedEntities": [
+                        {
+                            "entityType": "agreement",
+                            "relatedEntityId": OPPORTUNITY_ID,
+                        }
+                    ],
+                },
             ],
             "termOrConditions": [
                 {
-                    "type": "expirationType",
-                    "name": "expirationIndefinitive",
+                    "name": "Inflációkövető díjkorrekció",
+                    "type": "inflationAdjustmentRule",
+                    "characteristics": [
+                        {"name": "customCorrectionRule", "value": "true"},
+                        {"name": "adjustmentPeriodicity", "value": "yearly"},
+                        {"name": "validFromYear", "value": "2026"},
+                        {"name": "validToYear", "value": "2028"},
+                        {"name": "adjustmentDate", "value": "08-01"},
+                        {"name": "appliesToChargeType", "value": "recurring"},
+                        {"name": "applyInflationPercentage", "value": "5"},
+                        {"name": "maxIncreasePercentage", "value": "5"},
+                    ],
                 },
                 {
-                    "type": "leadTime",
-                    "duration": {
-                        "timePeriod": 15,
-                        "type": "day",
-                    },
+                    "validFor": {"startDateTime": "2019-07-04T21:59:59Z"},
+                    "duration": {"timePeriod": 30, "type": "day"},
+                    "type": "activation",
                 },
+                {"name": "expirationFixExt", "type": "expirationType"},
+                {
+                    "validFor": {"endDateTime": "2028-07-03T21:59:59Z"},
+                    "duration": {"timePeriod": 60, "type": "month"},
+                    "type": "autoprolongation",
+                },
+                {"type": "termination"},
                 {
                     "type": "paymentDueDate",
-                    "duration": {
-                        "timePeriod": 8,
-                        "type": "day",
-                    },
+                    "characteristics": [
+                        {"name": "unit", "value": "day"},
+                        {"name": "amount", "value": "30"},
+                    ],
                 },
                 {
-                    "type": "paymentPeriod",
-                    "duration": {
-                        "timePeriod": 1,
-                        "type": "month",
+                    "validFor": {
+                        "startDateTime": "2019-07-03T22:00:00Z",
+                        "endDateTime": "2021-07-03T21:59:59Z",
                     },
+                    "duration": {"timePeriod": 24},
+                    "type": "confidentialityClause",
+                    "characteristics": [{"name": "penaltyAmount", "value": "1200000"}],
                 },
                 {
-                    "type": "noticePeriod",
-                    "duration": {
-                        "timePeriod": 30,
-                        "type": "day",
-                    },
+                    "type": "usageCommitment",
+                    "characteristics": [
+                        {"name": "voiceFee", "value": "50000"},
+                        {"name": "voiceType", "value": "individual"},
+                        {"name": "otherFee", "value": "200000"},
+                        {"name": "otherType", "value": "extraServiceMonthlyFee"},
+                        {"name": "dataFee", "value": "100000"},
+                        {"name": "currency", "value": "HUF"},
+                        {"name": "applicableTo", "value": "all"},
+                    ],
                 },
             ],
             "audit": {
@@ -779,10 +935,16 @@ kafka_signed_body = {
             "type": "commercial",
             "subType": "frameAgreement",
             "characteristics": [
-                {"name": "isFrameAgreement", "value": "true"},
-                {"name": "externalOrderID", "value": ""},
-                {"name": "paymentPeriod", "value": "1Month"},
-                {"name": "processType", "value": "Webshop"},
+                {"name": "migrMethod", "value": "MOVE"},
+                {"name": "legacyID", "value": "536979013"},
+                {"name": "isPublicProcurementContract", "value": "false"},
+                {"name": "isDkuContract", "value": "false"},
+                {"name": "isEcoContract", "value": "false"},
+                {"name": "authentSetupMaster", "value": "495012014"},
+                {"name": "cidMaster", "value": "495012014"},
+                {"name": "isProductConstraintDisabled", "value": "false"},
+                {"name": "isConfidential", "value": "false"},
+                {"name": "dealerID", "value": "hamis.00001"},
             ],
             "agreementAuthorizations": [
                 {
@@ -830,12 +992,202 @@ kafka_signed_body = {
                         }
                     ],
                 },
+                {
+                    "entityType": "IccmWorkflow",
+                    "relatedEntityId": "2345654",
+                    "role": "CONTRACT",
+                },
+                {
+                    "entityType": "IccmWorkflow",
+                    "relatedEntityId": "3454324",
+                    "role": "ADJUSTMENT",
+                },
+            ],
+            "budgets": [
+                {
+                    "id": "a7167203-8953-47f2-95d6-abd75f4fc969",
+                    "priority": "10",
+                    "type": "poolSubsidy",
+                    "settlement": {"type": "financial", "units": "HUF"},
+                    "budgetValues": [{"type": "initial", "value": 5000000}],
+                    "budgetPeriod": {
+                        "startDateTime": "2019-07-03T22:00:00Z",
+                        "endDateTime": "2023-07-03T21:59:59Z",
+                    },
+                    "characteristics": [{"name": "approver"}],
+                    "termOrConditions": [
+                        {
+                            "name": "coveragePercentageMax",
+                            "description": "A kedvezmény mértékének maximális felhasználása százalékban.",
+                            "type": "limit",
+                            "characteristics": [
+                                {"name": "coveragePercentageMax", "value": "70"},
+                                {"name": "coverageBase", "value": "invoiceTotal"},
+                            ],
+                        },
+                        {
+                            "name": "budgetPenalty",
+                            "description": "A keret felhasználás kötbér képzéssel jár.",
+                            "type": "penalty",
+                            "characteristics": [
+                                {"name": "budgetPenalty", "value": "Y"}
+                            ],
+                        },
+                        {
+                            "name": "priceDiscountEligibilityCodes",
+                            "description": "Azon kedvezménykódok, amely kódokkal a keret felhasználható.",
+                            "type": "restriction",
+                            "characteristics": [
+                                {"name": "JAZZ_DISCOUNTCODE", "value": "KKV_12"},
+                                {"name": "JAZZ_DISCOUNTCODE", "value": "KKV_24"},
+                            ],
+                        },
+                        {
+                            "name": "usageModeDiscountCodes",
+                            "description": "Azon kedvezménykódok, amely kódokkal a keret felhasználható.",
+                            "type": "restriction",
+                            "characteristics": [
+                                {
+                                    "name": "JAZZ_DISCOUNTCODE",
+                                    "value": "SUBPOOL KESZ KEDV",
+                                }
+                            ],
+                        },
+                    ],
+                    "relatedParties": [
+                        {
+                            "entityReferredType": "Customer",
+                            "id": CUSTOMER_ID,
+                            "role": "contractOwner",
+                        }
+                    ],
+                    "relatedEntities": [
+                        {
+                            "entityType": "agreement",
+                            "relatedEntityId": OPPORTUNITY_ID,
+                        }
+                    ],
+                },
+                {
+                    "id": "327583d5-cc9c-4b79-ab5f-a0600b51150d",
+                    "priority": "10",
+                    "type": "poolSubsidy",
+                    "settlement": {"type": "financial", "units": "HUF"},
+                    "budgetValues": [{"type": "initial", "value": 12000000}],
+                    "budgetPeriod": {
+                        "startDateTime": "2020-07-03T22:00:00Z",
+                        "endDateTime": "2028-07-03T21:59:59Z",
+                    },
+                    "characteristics": [{"name": "approver"}],
+                    "termOrConditions": [
+                        {
+                            "name": "coveragePercentageMax",
+                            "description": "A kedvezmény mértékének maximális felhasználása százalékban.",
+                            "type": "limit",
+                            "characteristics": [
+                                {"name": "coveragePercentageMax", "value": "70"},
+                                {"name": "coverageBase", "value": "invoiceTotal"},
+                            ],
+                        },
+                        {
+                            "name": "budgetPenalty",
+                            "description": "A keret felhasználás kötbér képzéssel jár.",
+                            "type": "penalty",
+                            "characteristics": [
+                                {"name": "budgetPenalty", "value": "Y"}
+                            ],
+                        },
+                        {
+                            "name": "priceDiscountEligibilityCodes",
+                            "description": "Azon kedvezménykódok, amely kódokkal a keret felhasználható.",
+                            "type": "restriction",
+                            "characteristics": [
+                                {"name": "JAZZ_DISCOUNTCODE", "value": "KKV_12"},
+                                {"name": "JAZZ_DISCOUNTCODE", "value": "KKV_24"},
+                            ],
+                        },
+                        {
+                            "name": "usageModeDiscountCodes",
+                            "description": "Azon kedvezménykódok, amely kódokkal a keret felhasználható.",
+                            "type": "restriction",
+                            "characteristics": [
+                                {
+                                    "name": "JAZZ_DISCOUNTCODE",
+                                    "value": "SUBPOOL KESZ KEDV",
+                                }
+                            ],
+                        },
+                    ],
+                    "relatedParties": [
+                        {
+                            "entityReferredType": "Customer",
+                            "id": CUSTOMER_ID,
+                            "role": "contractOwner",
+                        }
+                    ],
+                    "relatedEntities": [
+                        {
+                            "entityType": "agreement",
+                            "relatedEntityId": OPPORTUNITY_ID,
+                        }
+                    ],
+                },
             ],
             "termOrConditions": [
                 {
-                    "type": "expirationType",
-                    "name": "expirationIndefinitive",
-                }
+                    "name": "Inflációkövető díjkorrekció",
+                    "type": "inflationAdjustmentRule",
+                    "characteristics": [
+                        {"name": "customCorrectionRule", "value": "true"},
+                        {"name": "adjustmentPeriodicity", "value": "yearly"},
+                        {"name": "validFromYear", "value": "2026"},
+                        {"name": "validToYear", "value": "2028"},
+                        {"name": "adjustmentDate", "value": "08-01"},
+                        {"name": "appliesToChargeType", "value": "recurring"},
+                        {"name": "applyInflationPercentage", "value": "5"},
+                        {"name": "maxIncreasePercentage", "value": "5"},
+                    ],
+                },
+                {
+                    "validFor": {"startDateTime": "2019-07-04T21:59:59Z"},
+                    "duration": {"timePeriod": 30, "type": "day"},
+                    "type": "activation",
+                },
+                {"name": "expirationFixExt", "type": "expirationType"},
+                {
+                    "validFor": {"endDateTime": "2028-07-03T21:59:59Z"},
+                    "duration": {"timePeriod": 60, "type": "month"},
+                    "type": "autoprolongation",
+                },
+                {"type": "termination"},
+                {
+                    "type": "paymentDueDate",
+                    "characteristics": [
+                        {"name": "unit", "value": "day"},
+                        {"name": "amount", "value": "30"},
+                    ],
+                },
+                {
+                    "validFor": {
+                        "startDateTime": "2019-07-03T22:00:00Z",
+                        "endDateTime": "2021-07-03T21:59:59Z",
+                    },
+                    "duration": {"timePeriod": 24},
+                    "type": "confidentialityClause",
+                    "characteristics": [{"name": "penaltyAmount", "value": "1200000"}],
+                },
+                {
+                    "type": "usageCommitment",
+                    "characteristics": [
+                        {"name": "voiceFee", "value": "50000"},
+                        {"name": "voiceType", "value": "individual"},
+                        {"name": "otherFee", "value": "200000"},
+                        {"name": "otherType", "value": "extraServiceMonthlyFee"},
+                        {"name": "dataFee", "value": "100000"},
+                        {"name": "currency", "value": "HUF"},
+                        {"name": "applicableTo", "value": "all"},
+                    ],
+                },
             ],
             "audit": {
                 "createdBy": CREATED_BY,
@@ -883,10 +1235,16 @@ kafka_active_body = {
             "type": "commercial",
             "subType": "frameAgreement",
             "characteristics": [
-                {"name": "isFrameAgreement", "value": "true"},
-                {"name": "externalOrderID", "value": ""},
-                {"name": "paymentPeriod", "value": "1Month"},
-                {"name": "processType", "value": "Webshop"},
+                {"name": "migrMethod", "value": "MOVE"},
+                {"name": "legacyID", "value": "536979013"},
+                {"name": "isPublicProcurementContract", "value": "false"},
+                {"name": "isDkuContract", "value": "false"},
+                {"name": "isEcoContract", "value": "false"},
+                {"name": "authentSetupMaster", "value": "495012014"},
+                {"name": "cidMaster", "value": "495012014"},
+                {"name": "isProductConstraintDisabled", "value": "false"},
+                {"name": "isConfidential", "value": "false"},
+                {"name": "dealerID", "value": "hamis.00001"},
             ],
             "agreementAuthorizations": [
                 {
@@ -934,12 +1292,202 @@ kafka_active_body = {
                         }
                     ],
                 },
+                {
+                    "entityType": "IccmWorkflow",
+                    "relatedEntityId": "2345654",
+                    "role": "CONTRACT",
+                },
+                {
+                    "entityType": "IccmWorkflow",
+                    "relatedEntityId": "3454324",
+                    "role": "ADJUSTMENT",
+                },
+            ],
+            "budgets": [
+                {
+                    "id": "a7167203-8953-47f2-95d6-abd75f4fc969",
+                    "priority": "10",
+                    "type": "poolSubsidy",
+                    "settlement": {"type": "financial", "units": "HUF"},
+                    "budgetValues": [{"type": "initial", "value": 5000000}],
+                    "budgetPeriod": {
+                        "startDateTime": "2019-07-03T22:00:00Z",
+                        "endDateTime": "2023-07-03T21:59:59Z",
+                    },
+                    "characteristics": [{"name": "approver"}],
+                    "termOrConditions": [
+                        {
+                            "name": "coveragePercentageMax",
+                            "description": "A kedvezmény mértékének maximális felhasználása százalékban.",
+                            "type": "limit",
+                            "characteristics": [
+                                {"name": "coveragePercentageMax", "value": "70"},
+                                {"name": "coverageBase", "value": "invoiceTotal"},
+                            ],
+                        },
+                        {
+                            "name": "budgetPenalty",
+                            "description": "A keret felhasználás kötbér képzéssel jár.",
+                            "type": "penalty",
+                            "characteristics": [
+                                {"name": "budgetPenalty", "value": "Y"}
+                            ],
+                        },
+                        {
+                            "name": "priceDiscountEligibilityCodes",
+                            "description": "Azon kedvezménykódok, amely kódokkal a keret felhasználható.",
+                            "type": "restriction",
+                            "characteristics": [
+                                {"name": "JAZZ_DISCOUNTCODE", "value": "KKV_12"},
+                                {"name": "JAZZ_DISCOUNTCODE", "value": "KKV_24"},
+                            ],
+                        },
+                        {
+                            "name": "usageModeDiscountCodes",
+                            "description": "Azon kedvezménykódok, amely kódokkal a keret felhasználható.",
+                            "type": "restriction",
+                            "characteristics": [
+                                {
+                                    "name": "JAZZ_DISCOUNTCODE",
+                                    "value": "SUBPOOL KESZ KEDV",
+                                }
+                            ],
+                        },
+                    ],
+                    "relatedParties": [
+                        {
+                            "entityReferredType": "Customer",
+                            "id": CUSTOMER_ID,
+                            "role": "contractOwner",
+                        }
+                    ],
+                    "relatedEntities": [
+                        {
+                            "entityType": "agreement",
+                            "relatedEntityId": OPPORTUNITY_ID,
+                        }
+                    ],
+                },
+                {
+                    "id": "327583d5-cc9c-4b79-ab5f-a0600b51150d",
+                    "priority": "10",
+                    "type": "poolSubsidy",
+                    "settlement": {"type": "financial", "units": "HUF"},
+                    "budgetValues": [{"type": "initial", "value": 12000000}],
+                    "budgetPeriod": {
+                        "startDateTime": "2020-07-03T22:00:00Z",
+                        "endDateTime": "2028-07-03T21:59:59Z",
+                    },
+                    "characteristics": [{"name": "approver"}],
+                    "termOrConditions": [
+                        {
+                            "name": "coveragePercentageMax",
+                            "description": "A kedvezmény mértékének maximális felhasználása százalékban.",
+                            "type": "limit",
+                            "characteristics": [
+                                {"name": "coveragePercentageMax", "value": "70"},
+                                {"name": "coverageBase", "value": "invoiceTotal"},
+                            ],
+                        },
+                        {
+                            "name": "budgetPenalty",
+                            "description": "A keret felhasználás kötbér képzéssel jár.",
+                            "type": "penalty",
+                            "characteristics": [
+                                {"name": "budgetPenalty", "value": "Y"}
+                            ],
+                        },
+                        {
+                            "name": "priceDiscountEligibilityCodes",
+                            "description": "Azon kedvezménykódok, amely kódokkal a keret felhasználható.",
+                            "type": "restriction",
+                            "characteristics": [
+                                {"name": "JAZZ_DISCOUNTCODE", "value": "KKV_12"},
+                                {"name": "JAZZ_DISCOUNTCODE", "value": "KKV_24"},
+                            ],
+                        },
+                        {
+                            "name": "usageModeDiscountCodes",
+                            "description": "Azon kedvezménykódok, amely kódokkal a keret felhasználható.",
+                            "type": "restriction",
+                            "characteristics": [
+                                {
+                                    "name": "JAZZ_DISCOUNTCODE",
+                                    "value": "SUBPOOL KESZ KEDV",
+                                }
+                            ],
+                        },
+                    ],
+                    "relatedParties": [
+                        {
+                            "entityReferredType": "Customer",
+                            "id": CUSTOMER_ID,
+                            "role": "contractOwner",
+                        }
+                    ],
+                    "relatedEntities": [
+                        {
+                            "entityType": "agreement",
+                            "relatedEntityId": OPPORTUNITY_ID,
+                        }
+                    ],
+                },
             ],
             "termOrConditions": [
                 {
-                    "type": "expirationType",
-                    "name": "expirationIndefinitive",
-                }
+                    "name": "Inflációkövető díjkorrekció",
+                    "type": "inflationAdjustmentRule",
+                    "characteristics": [
+                        {"name": "customCorrectionRule", "value": "true"},
+                        {"name": "adjustmentPeriodicity", "value": "yearly"},
+                        {"name": "validFromYear", "value": "2026"},
+                        {"name": "validToYear", "value": "2028"},
+                        {"name": "adjustmentDate", "value": "08-01"},
+                        {"name": "appliesToChargeType", "value": "recurring"},
+                        {"name": "applyInflationPercentage", "value": "5"},
+                        {"name": "maxIncreasePercentage", "value": "5"},
+                    ],
+                },
+                {
+                    "validFor": {"startDateTime": "2019-07-04T21:59:59Z"},
+                    "duration": {"timePeriod": 30, "type": "day"},
+                    "type": "activation",
+                },
+                {"name": "expirationFixExt", "type": "expirationType"},
+                {
+                    "validFor": {"endDateTime": "2028-07-03T21:59:59Z"},
+                    "duration": {"timePeriod": 60, "type": "month"},
+                    "type": "autoprolongation",
+                },
+                {"type": "termination"},
+                {
+                    "type": "paymentDueDate",
+                    "characteristics": [
+                        {"name": "unit", "value": "day"},
+                        {"name": "amount", "value": "30"},
+                    ],
+                },
+                {
+                    "validFor": {
+                        "startDateTime": "2019-07-03T22:00:00Z",
+                        "endDateTime": "2021-07-03T21:59:59Z",
+                    },
+                    "duration": {"timePeriod": 24},
+                    "type": "confidentialityClause",
+                    "characteristics": [{"name": "penaltyAmount", "value": "1200000"}],
+                },
+                {
+                    "type": "usageCommitment",
+                    "characteristics": [
+                        {"name": "voiceFee", "value": "50000"},
+                        {"name": "voiceType", "value": "individual"},
+                        {"name": "otherFee", "value": "200000"},
+                        {"name": "otherType", "value": "extraServiceMonthlyFee"},
+                        {"name": "dataFee", "value": "100000"},
+                        {"name": "currency", "value": "HUF"},
+                        {"name": "applicableTo", "value": "all"},
+                    ],
+                },
             ],
             "audit": {
                 "createdBy": CREATED_BY,

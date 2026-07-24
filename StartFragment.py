@@ -2,7 +2,6 @@ import requests
 import uuid
 from datetime import datetime, timezone
 
-from sqlalchemy import null
 from config import (
     PUBLISH_HOST,
     PUBLISH_HEADERS,
@@ -16,7 +15,7 @@ from config import (
 )
 
 # MANUAL INPUT
-quoteId = "1000001113"
+quoteId = "1000001132"
 
 # GENERATED VALUES
 now = datetime.now(timezone.utc)
@@ -354,7 +353,6 @@ agreement_create_response = requests.post(
 )
 
 print(f"STATUS: {agreement_create_response.status_code}")
-print(f"RESPONSE: {agreement_create_response.text}")
 print()
 
 

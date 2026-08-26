@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 
 load_dotenv(override=True)
 
-ENV = "DEV2"
+ENV = "DEV1"
 
 # 1. Környezet-specifikus
 PUBLISH_HOST = os.getenv(f"{ENV}_PUBLISH_HOST")

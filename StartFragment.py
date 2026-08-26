@@ -15,7 +15,7 @@ from config import (
 )
 
 # MANUAL INPUT
-quoteId = "1000001132"
+quoteId = "1000000378"
 
 # GENERATED VALUES
 now = datetime.now(timezone.utc)
@@ -362,7 +362,7 @@ print()
 kafka_draft_body = {
     "header": {
         "masterId": SFA_CONTRACT_ID,
-        "associationId": {},
+        "associationId": SFA_CONTRACT_ID,
         "tenantId": TENANT_ID,
         "trackingId": new_guid(),
         "messageId": new_guid(),
@@ -639,7 +639,7 @@ print()
 kafka_inprocess_body = {
     "header": {
         "masterId": SFA_CONTRACT_ID,
-        "associationId": {},
+        "associationId": SFA_CONTRACT_ID,
         "tenantId": TENANT_ID,
         "trackingId": new_guid(),
         "messageId": new_guid(),
@@ -760,7 +760,7 @@ print()
 kafka_signed_body = {
     "header": {
         "masterId": SFA_CONTRACT_ID,
-        "associationId": {},
+        "associationId": SFA_CONTRACT_ID,
         "tenantId": TENANT_ID,
         "trackingId": new_guid(),
         "messageId": new_guid(),
@@ -864,7 +864,7 @@ print()
 kafka_active_body = {
     "header": {
         "masterId": SFA_CONTRACT_ID,
-        "associationId": {},
+        "associationId": SFA_CONTRACT_ID,
         "tenantId": TENANT_ID,
         "trackingId": new_guid(),
         "messageId": new_guid(),

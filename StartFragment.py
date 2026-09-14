@@ -15,7 +15,7 @@ from config import (
 )
 
 # MANUAL INPUT
-quoteId = "1000000451"
+quoteId = "1000000453"
 
 # GENERATED VALUES
 now = datetime.now(timezone.utc)
@@ -1063,10 +1063,10 @@ print()
 
 payload = {
     "agreementId": GENERATED_ID,
-    "kafkaMethod": "CREATE",
+    "method": "CREATE",
 }
 
-response = requests.patch(PUBLISH_HOST, headers=PUBLISH_HEADERS, json=payload)
+response = requests.post(PUBLISH_HOST, headers=PUBLISH_HEADERS, json=payload)
 
 print("PUBLISH STATUS:", response.status_code)
 

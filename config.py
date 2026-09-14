@@ -28,6 +28,7 @@ PUBLISH_HEADERS = {
     "x-request-session-id": os.getenv("PUBLISH_X_REQUEST_SESSION_ID"),
     "Content-Type": "application/json",
     "x-api-key": PUBLISH_X_API_KEY,
+    "x-correlation-id": "1",
 }
 
 # Agreement alap fejléc

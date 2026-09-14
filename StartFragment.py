@@ -15,7 +15,7 @@ from config import (
 )
 
 # MANUAL INPUT
-quoteId = "1000000378"
+quoteId = "1000000451"
 
 # GENERATED VALUES
 now = datetime.now(timezone.utc)
@@ -30,12 +30,79 @@ SFA_CONTRACT_ID = f"TESZT-{compact_date}"
 AGREEMENT_NAME = f"Teszt Kft - {current_date}"
 
 
-# COMMON HELPERS
 def new_guid():
     return str(uuid.uuid4())
 
 
-# Agreement fejlécek
+TYPE_MAPPING = {
+    ("0001", "1754482458"): "bundles",
+    ("0001", "1754482468"): "excludes",
+    ("0001", "1754482472"): "excludes",
+    ("1754482458", "0001"): "isBundleOf",
+    ("1754482468", "0001"): "isExcludedBy",
+    ("1754482472", "0001"): "isExcludedBy",
+    ("0001", "80-0012"): "bundles",
+    ("0001", "1754875664-0012"): "excludes",
+    ("0001", "1754856196-0012"): "excludes",
+    ("0001", "1754858273-0012"): "excludes",
+    ("0001", "1754789275-0012"): "excludes",
+    ("0001", "1754900948-0012"): "excludes",
+    ("0001", "1754848100-0012"): "excludes",
+    ("80-0012", "0001"): "isBundleOf",
+    ("1754875664-0012", "0001"): "isExcludedBy",
+    ("1754856196-0012", "0001"): "isExcludedBy",
+    ("1754858273-0012", "0001"): "isExcludedBy",
+    ("1754789275-0012", "0001"): "isExcludedBy",
+    ("1754900948-0012", "0001"): "isExcludedBy",
+    ("1754848100-0012", "0001"): "isExcludedBy",
+}
+
+
+def parse_po_id(full_id):
+
+    if not full_id or "-" not in full_id:
+        return full_id, full_id
+
+    prefix, suffix = full_id.split("-", 1)
+    return prefix, suffix
+
+
+def update_related_product_offering_types(data):
+
+    updated_count = 0
+    skipped_includes_count = 0
+
+    for item in data:
+        for quote_item in item.get("quoteItems", []):
+            for po in quote_item.get("productOfferings", []):
+                po_id = po.get("id")
+                if not po_id:
+                    continue
+
+                _, po_suffix = parse_po_id(po_id)
+
+                for rel_po in po.get("relatedProductOfferings", []):
+                    rel_id = rel_po.get("id")
+                    if not rel_id:
+                        continue
+
+                    if rel_po.get("type") == "includes":
+                        skipped_includes_count += 1
+                        continue
+
+                    _, rel_suffix = parse_po_id(rel_id)
+
+                    matched_type = TYPE_MAPPING.get((po_suffix, rel_suffix))
+                    if matched_type:
+                        rel_po["type"] = matched_type
+                        updated_count += 1
+
+    print(
+        f"Frissítve: {updated_count} db | "
+        f"Kihagyva ('includes'): {skipped_includes_count} db."
+    )
+
+
 AGREEMENT_HEADERS = {
     **AGREEMENT_BASE_HEADERS,
     "X-Request-Id": new_guid(),
@@ -43,7 +110,6 @@ AGREEMENT_HEADERS = {
     "X-Request-Session-Id": new_guid(),
 }
 
-# Calculate Min fejlécek
 calculate_min_headers = {
     **CALCULATE_MIN_BASE_HEADERS,
     "X-Request-Id": new_guid(),
@@ -53,8 +119,9 @@ calculate_min_headers = {
 
 calculate_min_body = {"quoteId": quoteId}
 
-print("1. CALCULATE MIN")
+# --- 1. CALCULATE MIN ---
 
+print("1. CALCULATE MIN")
 
 calculate_min_response = requests.post(
     f"{QUOTE_HOST}/quoteManagement/internal/v1/calculateMin",
@@ -63,18 +130,27 @@ calculate_min_response = requests.post(
 )
 
 print(f"STATUS: {calculate_min_response.status_code}")
-print(GENERATED_ID)
+print(f"GENERATED ID: {GENERATED_ID}")
 print()
 
 calculate_min_response.raise_for_status()
 
 calculate_min_json = calculate_min_response.json()
 
+pos_quote_id = calculate_min_json[0].get("id")
+
+if not pos_quote_id:
+    raise Exception("POS Quote ID not found in calculateMin response")
+
+print(f"POS QUOTE ID FOR PATCH: {pos_quote_id}")
+
+update_related_product_offering_types(calculate_min_json)
+
 opportunity_entity = next(
     (
         entity
-        for entity in calculate_min_json[0]["relatedEntities"]
-        if entity["entityType"] == "Opportunity"
+        for entity in calculate_min_json[0].get("relatedEntities", [])
+        if entity.get("entityType") == "Opportunity"
     ),
     None,
 )
@@ -82,11 +158,32 @@ opportunity_entity = next(
 if not opportunity_entity:
     raise Exception("Opportunity entity not found in response")
 
-OPPORTUNITY_ID = opportunity_entity["relatedEntityId"]
-OPPORTUNITY_BUSINESS_ID = opportunity_entity["relatedEntityBusinessId"]
+OPPORTUNITY_ID = f"HU-MT~KT-{compact_date}"
+OPPORTUNITY_BUSINESS_ID = f"804{compact_date[-4:]}"
 
-print(f"OPPORTUNITY_ID: {OPPORTUNITY_ID}")
-print(f"OPPORTUNITY_BUSINESS_ID: {OPPORTUNITY_BUSINESS_ID}")
+opportunity_entity["relatedEntityId"] = OPPORTUNITY_ID
+opportunity_entity["relatedEntityBusinessId"] = OPPORTUNITY_BUSINESS_ID
+
+
+patch_headers = {
+    **calculate_min_headers,
+    "X-Request-Id": new_guid(),
+    "X-Request-Tracking-Id": new_guid(),
+    "X-Request-Session-Id": new_guid(),
+    "Connection": "close",
+}
+
+patch_body = calculate_min_json[0]
+
+patch_response = requests.patch(
+    f"{QUOTE_HOST}/quoteManagement/int/v1/quotes/{quoteId}",
+    headers=patch_headers,
+    json=patch_body,
+)
+
+print(f"PATCH STATUS: {patch_response.status_code}")
+patch_response.raise_for_status()
+print()
 
 related_parties = calculate_min_json[0].get("relatedParties", [])
 
@@ -98,9 +195,7 @@ CUSTOMER_ID = related_parties[0]["id"]
 print(f"CUSTOMER_ID: {CUSTOMER_ID}")
 print()
 
-
-# 2. AGREEMENT CREATE
-
+# --- 2. AGREEMENT CREATE ---
 
 agreement_create_body = {
     "id": GENERATED_ID,
@@ -110,6 +205,11 @@ agreement_create_body = {
     "completionDate": current_timestamp,
     "type": "commercial",
     "subType": "frameAgreement",
+    "categories": [
+        {"id": "mobile"},
+        {"id": "postpaid"},
+        {"id": "voice"},
+    ],
     "characteristics": [
         {"name": "migrMethod", "value": "MOVE"},
         {"name": "legacyID", "value": "536979013"},

@@ -15,7 +15,7 @@ from config import (
 )
 
 # MANUAL INPUT
-quoteId = "1000000453"
+quoteId = "1000000469"
 
 # GENERATED VALUES
 now = datetime.now(timezone.utc)
@@ -35,10 +35,10 @@ def new_guid():
 
 
 TYPE_MAPPING = {
-    ("0001", "1754482458"): "bundles",
+    ("0001", "1754482458"): "includes",
     ("0001", "1754482468"): "excludes",
     ("0001", "1754482472"): "excludes",
-    ("1754482458", "0001"): "isBundleOf",
+    ("1754482458", "0001"): "isChildOf",
     ("1754482468", "0001"): "isExcludedBy",
     ("1754482472", "0001"): "isExcludedBy",
     ("0001", "80-0012"): "bundles",
@@ -48,6 +48,7 @@ TYPE_MAPPING = {
     ("0001", "1754789275-0012"): "excludes",
     ("0001", "1754900948-0012"): "excludes",
     ("0001", "1754848100-0012"): "excludes",
+    ("0001", "1754928044-0012"): "excludes",
     ("80-0012", "0001"): "isBundleOf",
     ("1754875664-0012", "0001"): "isExcludedBy",
     ("1754856196-0012", "0001"): "isExcludedBy",
@@ -55,11 +56,11 @@ TYPE_MAPPING = {
     ("1754789275-0012", "0001"): "isExcludedBy",
     ("1754900948-0012", "0001"): "isExcludedBy",
     ("1754848100-0012", "0001"): "isExcludedBy",
+    ("1754928044-0012", "0001"): "isExcludedBy",
 }
 
 
 def parse_po_id(full_id):
-
     if not full_id or "-" not in full_id:
         return full_id, full_id
 
@@ -68,9 +69,8 @@ def parse_po_id(full_id):
 
 
 def update_related_product_offering_types(data):
-
     updated_count = 0
-    skipped_includes_count = 0
+    deleted_includes_count = 0
 
     for item in data:
         for quote_item in item.get("quoteItems", []):
@@ -80,28 +80,34 @@ def update_related_product_offering_types(data):
                     continue
 
                 _, po_suffix = parse_po_id(po_id)
+                related_pos = po.get("relatedProductOfferings", [])
 
-                for rel_po in po.get("relatedProductOfferings", []):
-                    rel_id = rel_po.get("id")
-                    if not rel_id:
-                        continue
+                for i in range(len(related_pos) - 1, -1, -1):
+                    rel_po = related_pos[i]
+                    rel_type = rel_po.get("type")
+                    rel_id = rel_po.get("id", "")
 
-                    if rel_po.get("type") == "includes":
-                        skipped_includes_count += 1
+                    if rel_type == "includes":
+                        del related_pos[i]
+                        deleted_includes_count += 1
                         continue
 
                     _, rel_suffix = parse_po_id(rel_id)
-
                     matched_type = TYPE_MAPPING.get((po_suffix, rel_suffix))
+
                     if matched_type:
                         rel_po["type"] = matched_type
                         updated_count += 1
+                        rel_type = matched_type
+
+                    # DEBUG LOG
+                    if "1754482458" in rel_id:
+                        print(f"[DEBUG] {rel_id} ÚJ ÁLLAPOTA: type='{rel_type}'")
 
     print(
-        f"Frissítve: {updated_count} db | "
-        f"Kihagyva ('includes'): {skipped_includes_count} db."
+        f"Feldolgozás kész: {updated_count} db kapcsolati típus frissítve | "
+        f"{deleted_includes_count} db 'includes' elem törölve."
     )
-
 
 AGREEMENT_HEADERS = {
     **AGREEMENT_BASE_HEADERS,
@@ -172,6 +178,8 @@ patch_headers = {
     "X-Request-Session-Id": new_guid(),
     "Connection": "close",
 }
+
+
 
 patch_body = calculate_min_json[0]
 

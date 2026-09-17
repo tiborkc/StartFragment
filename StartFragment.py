@@ -100,14 +100,7 @@ def update_related_product_offering_types(data):
                         updated_count += 1
                         rel_type = matched_type
 
-                    # DEBUG LOG
-                    if "1754482458" in rel_id:
-                        print(f"[DEBUG] {rel_id} ÚJ ÁLLAPOTA: type='{rel_type}'")
 
-    print(
-        f"Feldolgozás kész: {updated_count} db kapcsolati típus frissítve | "
-        f"{deleted_includes_count} db 'includes' elem törölve."
-    )
 
 AGREEMENT_HEADERS = {
     **AGREEMENT_BASE_HEADERS,

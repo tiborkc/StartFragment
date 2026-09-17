@@ -15,7 +15,7 @@ from config import (
 )
 
 # MANUAL INPUT
-quoteId = "1000000469"
+quoteId = "1000000470"
 
 # GENERATED VALUES
 now = datetime.now(timezone.utc)
@@ -99,7 +99,6 @@ def update_related_product_offering_types(data):
                         rel_po["type"] = matched_type
                         updated_count += 1
                         rel_type = matched_type
-
 
 
 AGREEMENT_HEADERS = {

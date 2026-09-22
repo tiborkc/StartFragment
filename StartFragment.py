@@ -15,7 +15,7 @@ from config import (
 )
 
 # MANUAL INPUT
-quoteId = "1000000470"
+quoteId = "1000000479"
 
 # GENERATED VALUES
 now = datetime.now(timezone.utc)
@@ -101,6 +101,31 @@ def update_related_product_offering_types(data):
                         rel_type = matched_type
 
 
+def fix_overridden_prices(data):
+    true_count = 0
+    modified_to_false_count = 0
+
+    for item in data:
+        for quote_item in item.get("quoteItems", []):
+            for po in quote_item.get("productOfferings", []):
+                for pop in po.get("productOfferingPrices", []):
+                    price_type = pop.get("priceType")
+                    
+                    if price_type == "usage":
+                        continue
+
+                    is_recurring_fee = price_type == "recurringFee"
+                    
+                    for char in pop.get("characteristics", []):
+                        if char.get("name") == "isOverriddenPrice":
+                            if true_count < 2 and is_recurring_fee:
+                                char["value"] = "true"
+                                true_count += 1
+                            else:
+                                char["value"] = "false"
+                                modified_to_false_count += 1
+
+
 AGREEMENT_HEADERS = {
     **AGREEMENT_BASE_HEADERS,
     "X-Request-Id": new_guid(),
@@ -144,6 +169,8 @@ print(f"POS QUOTE ID FOR PATCH: {pos_quote_id}")
 
 update_related_product_offering_types(calculate_min_json)
 
+fix_overridden_prices(calculate_min_json)
+
 opportunity_entity = next(
     (
         entity
@@ -172,7 +199,6 @@ patch_headers = {
 }
 
 
-
 patch_body = calculate_min_json[0]
 
 patch_response = requests.patch(
@@ -181,7 +207,7 @@ patch_response = requests.patch(
     json=patch_body,
 )
 
-print(f"PATCH STATUS: {patch_response.status_code}")
+print(f"Quote PATCH STATUS: {patch_response.status_code}")
 patch_response.raise_for_status()
 print()
 
@@ -854,6 +880,49 @@ print(kafka_inprocess_response.text)
 print()
 
 
+base_agreement_url = f"{AGREEMENT_HOST}/agreements/internal/v2/agreements/{GENERATED_ID}"
+
+correlation_id = f"corr-{uuid.uuid4()}"
+v2_headers = {
+    **AGREEMENT_HEADERS,
+    "x-channel-id": "B2B",
+    "brand": "MT",
+    "x-m2m-user-id": "m2mUserId123",
+    "x-context-id": f"context-{uuid.uuid4()}",
+    "x-correlation-id": correlation_id,
+    "x-request-id": correlation_id,
+    "x-request-session-id": correlation_id,
+    "x-request-tracking-id": correlation_id,
+}
+
+get_agr_res = requests.get(base_agreement_url, headers=v2_headers)
+print(f"discountedEntrySimOnly GET STATUS: {get_agr_res.status_code}")
+get_agr_res.raise_for_status()
+agr_data = get_agr_res.json()
+
+if "termOrConditions" not in agr_data or agr_data["termOrConditions"] is None:
+    agr_data["termOrConditions"] = []
+
+new_term = {
+    "type": "discountedEntrySimOnly",
+    "characteristics": [
+        {
+            "name": "commitmentMonth",
+            "value": "24"
+        }
+    ]
+}
+
+agr_data["termOrConditions"].append(new_term)
+
+patch_url = f"{base_agreement_url}?fields=termOrConditions"
+
+patch_agr_res = requests.patch(patch_url, headers=v2_headers, json=agr_data)
+print(f"discountedEntrySimOnly PATCH STATUS: {patch_agr_res.status_code}")
+patch_agr_res.raise_for_status()
+print()
+
+
 # 5. KAFKA SAVE SIGNED
 
 
@@ -1070,4 +1139,3 @@ response = requests.post(PUBLISH_HOST, headers=PUBLISH_HEADERS, json=payload)
 
 print("PUBLISH STATUS:", response.status_code)
 
-print("FLOW FINISHED")

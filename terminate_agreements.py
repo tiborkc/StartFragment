@@ -89,5 +89,5 @@ def terminate_agreements_by_mtid(mt_id: str):
 
 if __name__ == "__main__":
     # Add meg az MTID-t amit fel szeretnél dolgozni
-    TARGET_MTID = "814063238"
+    TARGET_MTID = "495294470"
     terminate_agreements_by_mtid(TARGET_MTID)

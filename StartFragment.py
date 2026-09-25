@@ -12,10 +12,11 @@ from config import (
     CREATED_BY,
     AGREEMENT_BASE_HEADERS,
     CALCULATE_MIN_BASE_HEADERS,
+    TYPE_MAPPING,
 )
 
 # MANUAL INPUT
-quoteId = "1000000479"
+quoteId = "1000001297"
 
 # GENERATED VALUES
 now = datetime.now(timezone.utc)
@@ -32,32 +33,6 @@ AGREEMENT_NAME = f"Teszt Kft - {current_date}"
 
 def new_guid():
     return str(uuid.uuid4())
-
-
-TYPE_MAPPING = {
-    ("0001", "1754482458"): "includes",
-    ("0001", "1754482468"): "excludes",
-    ("0001", "1754482472"): "excludes",
-    ("1754482458", "0001"): "isChildOf",
-    ("1754482468", "0001"): "isExcludedBy",
-    ("1754482472", "0001"): "isExcludedBy",
-    ("0001", "80-0012"): "bundles",
-    ("0001", "1754875664-0012"): "excludes",
-    ("0001", "1754856196-0012"): "excludes",
-    ("0001", "1754858273-0012"): "excludes",
-    ("0001", "1754789275-0012"): "excludes",
-    ("0001", "1754900948-0012"): "excludes",
-    ("0001", "1754848100-0012"): "excludes",
-    ("0001", "1754928044-0012"): "excludes",
-    ("80-0012", "0001"): "isBundleOf",
-    ("1754875664-0012", "0001"): "isExcludedBy",
-    ("1754856196-0012", "0001"): "isExcludedBy",
-    ("1754858273-0012", "0001"): "isExcludedBy",
-    ("1754789275-0012", "0001"): "isExcludedBy",
-    ("1754900948-0012", "0001"): "isExcludedBy",
-    ("1754848100-0012", "0001"): "isExcludedBy",
-    ("1754928044-0012", "0001"): "isExcludedBy",
-}
 
 
 def parse_po_id(full_id):
@@ -125,6 +100,18 @@ def fix_overridden_prices(data):
                                 char["value"] = "false"
                                 modified_to_false_count += 1
 
+def fix_roaming_pop_id(data):
+    added_count = 0
+
+    for item in data:
+        for quote_item in item.get("quoteItems", []):
+            for po in quote_item.get("productOfferings", []):
+                for pop in po.get("productOfferingPrices", []):
+                    if pop.get("name") == "Roaming indított 6/1 Zóna" and "id" not in pop:
+                        pop["id"] = "1638377358"
+                        added_count += 1
+
+    return added_count
 
 AGREEMENT_HEADERS = {
     **AGREEMENT_BASE_HEADERS,
@@ -170,6 +157,8 @@ print(f"POS QUOTE ID FOR PATCH: {pos_quote_id}")
 update_related_product_offering_types(calculate_min_json)
 
 fix_overridden_prices(calculate_min_json)
+
+fix_roaming_pop_id(calculate_min_json)
 
 opportunity_entity = next(
     (

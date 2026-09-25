@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 
 load_dotenv(override=True)
 
-ENV = "DEV1"
+ENV = "DEV2"
 
 # 1. Környezet-specifikus
 PUBLISH_HOST = os.getenv(f"{ENV}_PUBLISH_HOST")
@@ -49,4 +49,29 @@ CALCULATE_MIN_BASE_HEADERS = {
     "x-source-system-user": "1234567",
     "x-parent-request-id": "12345678",
     "tenantId": TENANT_ID,
+}
+
+TYPE_MAPPING = {
+    ("0001", "1754482458"): "includes",
+    ("0001", "1754482468"): "excludes",
+    ("0001", "1754482472"): "excludes",
+    ("1754482458", "0001"): "isChildOf",
+    ("1754482468", "0001"): "isExcludedBy",
+    ("1754482472", "0001"): "isExcludedBy",
+    ("0001", "80-0012"): "bundles",
+    ("0001", "1754875664-0012"): "excludes",
+    ("0001", "1754856196-0012"): "excludes",
+    ("0001", "1754858273-0012"): "excludes",
+    ("0001", "1754789275-0012"): "excludes",
+    ("0001", "1754900948-0012"): "excludes",
+    ("0001", "1754848100-0012"): "excludes",
+    ("0001", "1754928044-0012"): "excludes",
+    ("80-0012", "0001"): "isBundleOf",
+    ("1754875664-0012", "0001"): "isExcludedBy",
+    ("1754856196-0012", "0001"): "isExcludedBy",
+    ("1754858273-0012", "0001"): "isExcludedBy",
+    ("1754789275-0012", "0001"): "isExcludedBy",
+    ("1754900948-0012", "0001"): "isExcludedBy",
+    ("1754848100-0012", "0001"): "isExcludedBy",
+    ("1754928044-0012", "0001"): "isExcludedBy",
 }

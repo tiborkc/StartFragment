@@ -22,7 +22,7 @@ def terminate_agreements_by_mtid(mt_id: str):
 
     query_params = (
         "query=and("
-        "or(eq(type,frameContract),and(eq(type,commercial),eq(subType,frameAgreement))),"
+        "or(eq(type,frameContract),and(eq(type,commercial),eq(subType,salesAgreement))),"
         f"contains(relatedParties,and(eq(id,{mt_id}),eq(entityReferredType,Customer))),"
         "in(status,active,rejected,inProtectionPeriod)"
         ")&page=0&size=100&fields=id,status"
@@ -89,5 +89,5 @@ def terminate_agreements_by_mtid(mt_id: str):
 
 if __name__ == "__main__":
     # Add meg az MTID-t amit fel szeretnél dolgozni
-    TARGET_MTID = "495294470"
+    TARGET_MTID = "494910914"
     terminate_agreements_by_mtid(TARGET_MTID)

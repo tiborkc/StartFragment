@@ -18,4 +18,6 @@ dist/
 build/
 *.egg-info/
 
-Viktor.py
+beleturkalo.py
+sourcetypemapping.py
+childrateplanpatch.py

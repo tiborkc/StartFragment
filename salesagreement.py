@@ -14,7 +14,7 @@ from config import (
 )
 
 # MANUAL INPUT
-quoteId = "1000000511"
+quoteId = "1000001568"
 
 # GENERATED VALUES
 now = datetime.now(timezone.utc)
@@ -97,6 +97,8 @@ patch_source_response = requests.patch(
 )
 
 print(f"Source Quote PATCH STATUS: {patch_source_response.status_code}")
+if patch_source_response.status_code != 200:
+    print(f"Body: {patch_source_response.text}")
 patch_source_response.raise_for_status()
 print()
 
@@ -122,7 +124,6 @@ calculate_min_json = calculate_min_response.json()
 
 quote_resp = calculate_min_json[0]
 
-# Adatok kinyerése a specifikáció alapján
 customer_id = next(
     (party.get("id") for party in quote_resp.get("relatedParties", []) if party.get("role") == "owner" and party.get("entityReferredType") == "Customer"),
     "494910914"
@@ -242,7 +243,9 @@ agreement_inprocess_response = requests.post(
 )
 
 print(f"STATUS: {agreement_inprocess_response.status_code}")
-#print(f"Body: {agreement_inprocess_response.text}")
+
+if agreement_inprocess_response.status_code != 200:
+    print(f"Body: {agreement_inprocess_response.text}")
 agreement_inprocess_response.raise_for_status()
 current_response_json = agreement_inprocess_response.json()
 print()
@@ -268,7 +271,8 @@ agreement_signed_response = requests.post(
 )
 
 print(f"STATUS: {agreement_signed_response.status_code}")
-#print(f"Body: {agreement_signed_response.text}")
+if agreement_signed_response.status_code != 200:
+    print(f"Body: {agreement_signed_response.text}")
 agreement_signed_response.raise_for_status()
 current_response_json = agreement_signed_response.json()
 print()
@@ -374,6 +378,8 @@ agreement_active_response = requests.post(
 )
 
 print(f"STATUS: {agreement_active_response.status_code}")
+if agreement_active_response.status_code != 200:
+    print(f"Body: {agreement_active_response.text}")
 print(agreement_active_response.text)
 agreement_active_response.raise_for_status()
 print()

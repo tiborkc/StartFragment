@@ -19,6 +19,3 @@ build/
 *.egg-info/
 
 beleturkalo.py
-sourcetypemapping.py
-childrateplanpatch.py
-sa_quote_agreement.py

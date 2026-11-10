@@ -1,22 +1,22 @@
-import requests
-import uuid
 from datetime import datetime, timezone
+import uuid
 
+import requests
 from config import (
-    PUBLISH_HOST,
-    PUBLISH_HEADERS,
+    AGREEMENT_BASE_HEADERS,
     AGREEMENT_HOST,
+    CALCULATE_MIN_BASE_HEADERS,
+    CREATED_BY,
+    MONOGRAM,
+    PUBLISH_HEADERS,
+    PUBLISH_HOST,
     QUOTE_HOST,
     TENANT_ID,
-    MONOGRAM,
-    CREATED_BY,
-    AGREEMENT_BASE_HEADERS,
-    CALCULATE_MIN_BASE_HEADERS,
     TYPE_MAPPING,
 )
 
 # MANUAL INPUT
-quoteId = "1000001475"
+quoteId = "1000000552"
 
 # GENERATED VALUES
 now = datetime.now(timezone.utc)
@@ -85,12 +85,12 @@ def fix_overridden_prices(data):
             for po in quote_item.get("productOfferings", []):
                 for pop in po.get("productOfferingPrices", []):
                     price_type = pop.get("priceType")
-                    
+
                     if price_type == "usage":
                         continue
 
                     is_recurring_fee = price_type == "recurringFee"
-                    
+
                     for char in pop.get("characteristics", []):
                         if char.get("name") == "isOverriddenPrice":
                             if true_count < 2 and is_recurring_fee:
@@ -100,6 +100,7 @@ def fix_overridden_prices(data):
                                 char["value"] = "false"
                                 modified_to_false_count += 1
 
+
 def fix_roaming_pop_id(data):
     added_count = 0
 
@@ -107,11 +108,15 @@ def fix_roaming_pop_id(data):
         for quote_item in item.get("quoteItems", []):
             for po in quote_item.get("productOfferings", []):
                 for pop in po.get("productOfferingPrices", []):
-                    if pop.get("name") == "Roaming indított 6/1 Zóna" and "id" not in pop:
+                    if (
+                        pop.get("name") == "Roaming indított 6/1 Zóna"
+                        and "id" not in pop
+                    ):
                         pop["id"] = "1638377358"
                         added_count += 1
 
     return added_count
+
 
 AGREEMENT_HEADERS = {
     **AGREEMENT_BASE_HEADERS,
@@ -127,11 +132,59 @@ calculate_min_headers = {
     "X-Request-Session-Id": new_guid(),
 }
 
-calculate_min_body = {"quoteId": quoteId}
+# --- 0. GET SOURCE QUOTE & UPDATE TYPE MAPPING ---
+
+print("0. GET SOURCE QUOTE & UPDATE TYPE MAPPING")
+
+get_headers = {
+    **calculate_min_headers,
+    "X-Request-Id": new_guid(),
+    "X-Request-Tracking-Id": new_guid(),
+    "X-Request-Session-Id": new_guid(),
+}
+
+get_response = requests.get(
+    f"{QUOTE_HOST}/quoteManagement/int/v1/quotes/{quoteId}",
+    headers=get_headers,
+)
+
+print(f"GET Quote STATUS: {get_response.status_code}")
+get_response.raise_for_status()
+
+source_quote_json = get_response.json()
+
+source_quote_data = (
+    source_quote_json if isinstance(source_quote_json, list) else [source_quote_json]
+)
+
+# Type mapping futtatása a source quote-on
+update_related_product_offering_types(source_quote_data)
+
+# Source quote visszapatcselése a módosított adatokkal
+patch_source_headers = {
+    **calculate_min_headers,
+    "X-Request-Id": new_guid(),
+    "X-Request-Tracking-Id": new_guid(),
+    "X-Request-Session-Id": new_guid(),
+    "Connection": "close",
+}
+
+patch_source_response = requests.patch(
+    f"{QUOTE_HOST}/quoteManagement/int/v1/quotes/{quoteId}",
+    headers=patch_source_headers,
+    json=source_quote_data[0],
+)
+
+print(f"Source Quote PATCH STATUS: {patch_source_response.status_code}")
+patch_source_response.raise_for_status()
+print()
+
 
 # --- 1. CALCULATE MIN ---
 
 print("1. CALCULATE MIN")
+
+calculate_min_body = {"quoteId": quoteId}
 
 calculate_min_response = requests.post(
     f"{QUOTE_HOST}/quoteManagement/internal/v1/calculateMin",
@@ -153,8 +206,6 @@ if not pos_quote_id:
     raise Exception("POS Quote ID not found in calculateMin response")
 
 print(f"POS QUOTE ID FOR PATCH: {pos_quote_id}")
-
-update_related_product_offering_types(calculate_min_json)
 
 fix_overridden_prices(calculate_min_json)
 
@@ -186,7 +237,6 @@ patch_headers = {
     "X-Request-Session-Id": new_guid(),
     "Connection": "close",
 }
-
 
 patch_body = calculate_min_json[0]
 
@@ -462,7 +512,7 @@ print("2. AGREEMENT CREATE")
 
 
 agreement_create_response = requests.post(
-    f"{AGREEMENT_HOST}/agreements/internal/v1/agreements",
+    f"{AGREEMENT_HOST}/agreements/internal/v2/agreements/actions/submit-agreement",
     headers=AGREEMENT_HEADERS,
     json=agreement_create_body,
 )
@@ -885,9 +935,12 @@ v2_headers = {
 }
 
 get_agr_res = requests.get(base_agreement_url, headers=v2_headers)
-print(f"discountedEntrySimOnly GET STATUS: {get_agr_res.status_code}")
+print(f"Agreement GET STATUS: {get_agr_res.status_code}")
 get_agr_res.raise_for_status()
 agr_data = get_agr_res.json()
+
+current_submission_datetime = datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
+
 
 if "termOrConditions" not in agr_data or agr_data["termOrConditions"] is None:
     agr_data["termOrConditions"] = []
@@ -907,7 +960,7 @@ agr_data["termOrConditions"].append(new_term)
 patch_url = f"{base_agreement_url}?fields=termOrConditions"
 
 patch_agr_res = requests.patch(patch_url, headers=v2_headers, json=agr_data)
-print(f"discountedEntrySimOnly PATCH STATUS: {patch_agr_res.status_code}")
+print(f"Agreement PATCH STATUS: {patch_agr_res.status_code}")
 patch_agr_res.raise_for_status()
 print()
 
